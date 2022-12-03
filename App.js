@@ -4,6 +4,9 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, { useState ,useEffect} from 'react';
 import * as Location from 'expo-location';
+import { sendEmail } from './send-email';
+
+
 
 
 function Topicsc({navigation}){
@@ -130,6 +133,15 @@ function Detailssc({navigation}){
       />
       <TouchableOpacity onPress={() => {
             console.log(text);
+            sendEmail(
+              'akhil183@gmail.com',
+                 'We need your feedback',
+                 text,
+           { cc: 'ananya.aggrawal@gmail.com' }
+          ).then(() => {
+              console.log('Your message was successfully sent!');
+          });
+    
           }} >
         <Text style={styles.buttonstext}>Send the Mail</Text>
       </TouchableOpacity>
@@ -221,4 +233,7 @@ const senators = [
   type: "Congresswoman",
 	name: "Lizzie Fletcher"}
 ];
+
+
+
 export default App;
