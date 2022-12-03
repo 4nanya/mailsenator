@@ -11,11 +11,11 @@ function Topicsc({navigation}){
   return(
     
     <View style={styles.container}>
-      {persons.map((person) => {
+      {topics.map((topic) => {
           return(
               
-            <TouchableOpacity key={person.id} onPress={() => navigation.navigate('Choose your State')} >
-            <Text  style={styles.buttonstext}>{person.name}</Text>
+            <TouchableOpacity key={topic.id} onPress={() => navigation.navigate('Choose your Politician')} >
+            <Text  style={styles.buttonstext}>{topic.name}</Text>
             
             <View style={styles.space} />
             </TouchableOpacity>
@@ -29,6 +29,7 @@ function Topicsc({navigation}){
       
     );
 }
+
 function Statesc({navigation}){
   const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
   const [displayCurrentAddress, setDisplayCurrentAddress] = useState(
@@ -60,7 +61,7 @@ function Statesc({navigation}){
   // create the handler method
   
   const GetCurrentLocation = async () => {
-    let { status } = await Location.requestPermissionsAsync();
+    let { status } = await Location.requestForegroundPermissionsAsync();
   
     if (status !== 'granted') {
       Alert.alert(
@@ -92,15 +93,27 @@ function Statesc({navigation}){
 
     <View style={styles.container}>
       <Text>Your Zip Code: {displayCurrentAddress}</Text>
+      <View style={styles.space} />
+      <Text>Select your member of Congress to Mail to</Text>
+      <View style={styles.space} />
 
-      {/* {senators.map((senator) => {
-        current= '{senator.id}';
-      if (current==displayCurrentAddress){
-        
-      }
-      
-      
-      })}; */}
+      {senators.map((senator) => {
+        //console.log(senator);
+        //console.log({senator.id});
+
+        if (senator.id==displayCurrentAddress){
+          console.log("Matchfound " , senator);
+          return (
+            <TouchableOpacity key={senator.id} onPress={() => navigation.navigate('Compose your letter')} >
+            <Text  style={styles.buttonstext}>{senator.type}: {senator.name}</Text>
+            <View style={styles.space} />
+            </TouchableOpacity>
+          ); 
+      } else {
+        console.log("NOT Matchfound " , senator);
+      }    
+      })}
+
     </View>
     );
 }
@@ -118,7 +131,7 @@ function Detailssc({navigation}){
       <TouchableOpacity onPress={() => {
             console.log(text);
           }} >
-        <Text style={styles.buttonstext}>poop</Text>
+        <Text style={styles.buttonstext}>Send the Mail</Text>
       </TouchableOpacity>
     </View>
    
@@ -128,14 +141,13 @@ function Detailssc({navigation}){
 const Stack = createNativeStackNavigator();
 
 function App() {
-//  text ="akhil aggrawal";
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='What do you want to write about?'>
         <Stack.Screen name="What do you want to write about?" component={Topicsc}/>
         <Stack.Screen name="Compose your letter" component={Detailssc}/>
-        <Stack.Screen name="Choose your State" component={Statesc}/>
+        <Stack.Screen name="Choose your Politician" component={Statesc}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -171,7 +183,7 @@ const styles = StyleSheet.create({
     //color: "white",
   },
 });
-const persons = [
+const topics = [
   {id: "1",
 	name: "healthcare", },
   { id: "2",
@@ -203,8 +215,10 @@ const persons = [
 ];
 const senators = [
   { id: "94539",
-	name: "Ro Khanna",},
+  type: "Congressman",
+	name: "Ro Khanna"},
   { id: "77449",
-	name: "Lizzie Fletcher",},
+  type: "Congresswoman",
+	name: "Lizzie Fletcher"}
 ];
 export default App;
