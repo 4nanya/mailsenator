@@ -1,8 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text,TextInput, View , TouchableOpacity, Button} from 'react-native';
+import { StyleSheet, Text,TextInput, View , TouchableOpacity, Button,Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
+import * as Location from 'expo-location';
+
 
 function Topicsc({navigation}){
 
@@ -12,7 +14,7 @@ function Topicsc({navigation}){
       {persons.map((person) => {
           return(
               
-            <TouchableOpacity key='{person.ID}' onPress={() => navigation.navigate('Compose your letter')} >
+            <TouchableOpacity key={person.id} onPress={() => navigation.navigate('Choose your State')} >
             <Text  style={styles.buttonstext}>{person.name}</Text>
             
             <View style={styles.space} />
@@ -25,6 +27,81 @@ function Topicsc({navigation}){
 
       </View>
       
+    );
+}
+function Statesc({navigation}){
+  const [locationServiceEnabled, setLocationServiceEnabled] = useState(false);
+  const [displayCurrentAddress, setDisplayCurrentAddress] = useState(
+    'Wait, we are fetching you location...'
+  );
+  useEffect(() => {
+    CheckIfLocationEnabled();
+  }, []);
+
+  const CheckIfLocationEnabled = async () => {
+    let enabled = await Location.hasServicesEnabledAsync();
+
+    if (!enabled) {
+      Alert.alert(
+        'Location Service not enabled',
+        'Please enable your location services to continue',
+        [{ text: 'OK' }],
+        { cancelable: false }
+      );
+    } else {
+      setLocationServiceEnabled(enabled);
+    }
+  };
+  useEffect(() => {
+    CheckIfLocationEnabled();
+    GetCurrentLocation();
+  }, []);
+  
+  // create the handler method
+  
+  const GetCurrentLocation = async () => {
+    let { status } = await Location.requestPermissionsAsync();
+  
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission not granted',
+        'Allow the app to use location service.',
+        [{ text: 'OK' }],
+        { cancelable: false }
+      );
+    }
+  
+    let { coords } = await Location.getCurrentPositionAsync();
+  
+    if (coords) {
+      const { latitude, longitude } = coords;
+      let response = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude
+      });
+  
+      for (let item of response) {
+        let address = `${item.postalCode}`;
+  
+        setDisplayCurrentAddress(address);
+      }
+    }
+  };
+  return(
+
+
+    <View style={styles.container}>
+      <Text>Your Zip Code: {displayCurrentAddress}</Text>
+
+      {/* {senators.map((senator) => {
+        current= '{senator.id}';
+      if (current==displayCurrentAddress){
+        
+      }
+      
+      
+      })}; */}
+    </View>
     );
 }
 function Detailssc({navigation}){
@@ -58,6 +135,7 @@ function App() {
       <Stack.Navigator initialRouteName='What do you want to write about?'>
         <Stack.Screen name="What do you want to write about?" component={Topicsc}/>
         <Stack.Screen name="Compose your letter" component={Detailssc}/>
+        <Stack.Screen name="Choose your State" component={Statesc}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -122,5 +200,11 @@ const persons = [
 	name: "energy", },
   {id: "14",
 	name: "homelessness", },
+];
+const senators = [
+  { id: "94539",
+	name: "Ro Khanna",},
+  { id: "77449",
+	name: "Lizzie Fletcher",},
 ];
 export default App;
