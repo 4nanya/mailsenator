@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text,TextInput, View , TouchableOpacity, Button,Alert} from 'react-native';
+import { StyleSheet, Text,TextInput, View , TouchableOpacity, Button,Alert, SafeAreaView} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, { useState ,useEffect} from 'react';
@@ -95,9 +95,9 @@ function Statesc({navigation}){
 
 
     <View style={styles.container}>
-      <Text>Your Zip Code: {displayCurrentAddress}</Text>
+      <Text style={styles.words}>Your Zip Code: {displayCurrentAddress}</Text>
       <View style={styles.space} />
-      <Text>Select your member of Congress to Mail to</Text>
+      <Text >Select your member of Congress to Mail to:</Text>
       <View style={styles.space} />
 
       {senators.map((senator) => {
@@ -107,45 +107,57 @@ function Statesc({navigation}){
         if (senator.id==displayCurrentAddress){
           console.log("Matchfound " , senator);
           return (
-            <TouchableOpacity key={senator.id} onPress={() => navigation.navigate('Compose your letter')} >
+            <TouchableOpacity key={senator.uid} onPress={() => navigation.navigate('Compose your letter')} >
             <Text  style={styles.buttonstext}>{senator.type}: {senator.name}</Text>
             <View style={styles.space} />
             </TouchableOpacity>
           ); 
-      } else {
-        console.log("NOT Matchfound " , senator);
-      }    
+      
+      };
       })}
 
     </View>
     );
 }
 function Detailssc({navigation}){
-  const [text, setText] = useState('');
+  const [text, setText] = useState('Dear Congressman Ro Khanna, \
+        I am writing to you because I am deeply concerned about the state of climate change in our country. This issue is critical for you to implement because *insert reasoning here*. It is up to you address this, as the wellness of our communitiy depends on it. \
+        Sincerely, *your name*');
 
   return(
+
   <View style={styles.container}>
-      <TextInput
-        style={styles.textbox}
-        placeholder="Type here to translate!"
-        onChangeText={newText => setText(newText)}
-        defaultValue={text}
-      />
-      <TouchableOpacity onPress={() => {
+        <TouchableOpacity onPress={() => {
             console.log(text);
             sendEmail(
-              'akhil183@gmail.com',
-                 'We need your feedback',
+              'Rep.Khanna@opencongress.org',
+                 'Concerned about climate change.',
                  text,
            { cc: 'ananya.aggrawal@gmail.com' }
           ).then(() => {
               console.log('Your message was successfully sent!');
+              <Text>good job fam</Text>
           });
     
           }} >
-        <Text style={styles.buttonstext}>Send the Mail</Text>
+        <Text style={styles.buttonstext}>Send your email!</Text>
       </TouchableOpacity>
+      <View style={styles.space} />
+      <TextInput
+        style={styles.textbox}
+        placeholder="         Compose your letter here!"
+        onChangeText={newText => setText(newText)}
+        defaultValue={text}
+        //value={this.state.value}
+        //onChangeText={text=>this.setState({value:text})}
+        multiline={true}
+        numberOfLines={4}
+      />
+    
+
+      
     </View>
+
    
   );
 }
@@ -172,8 +184,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textbox:{
-    height: 100,
+    height: 600,
     fontSize:20,
+    width:400,
+    borderWidth:1,
+    padding:10,
+    flexWrap:'wrap',
+    textAlignVertical: "top",
+
+    
   },
   buttonstext: {
     borderRadius: 5,
@@ -193,6 +212,9 @@ const styles = StyleSheet.create({
     //width: 10, // or whatever size you need
     height: 15,
     //color: "white",
+  },
+  words: {
+    fontSize:25,
   },
 });
 const topics = [
@@ -227,9 +249,19 @@ const topics = [
 ];
 const senators = [
   { id: "94539",
+  uid:"1",
   type: "Congressman",
 	name: "Ro Khanna"},
+  { id: "94539",
+  uid:"2",
+  type: "Senator",
+	name: "Alex Padilla"},
+  { id: "94539",
+  uid:"3",
+  type: "Senator",
+	name: "Dianne Feinstein"},
   { id: "77449",
+  uid:"4",
   type: "Congresswoman",
 	name: "Lizzie Fletcher"}
 ];
